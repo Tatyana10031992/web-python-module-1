@@ -60,6 +60,8 @@ messages_count = {}
 user_words = {}
 frq_words = {}
 most_frq = {}
+user_timestamps = {}
+max_breaks = {}
 
 
 
@@ -107,7 +109,30 @@ if max_user_name != None:
 
 common_words = set.intersection(*user_words.values())
 
+
+for message in messages:
+    user = message["user"]
+    timestamp = message["timestamp"]
+    if user not in user_timestamps:
+        user_timestamps[user] = []
+    user_timestamps[user].append(timestamp)
     
+for user, timestamps in user_timestamps.items():
+    timestamps.sort()
+    max_gap = 0
+    for i in range(1, len(timestamps)):
+        gap = timestamps[i] - timestamps[i - 1]
+        if gap > max_gap:
+            max_gap = gap
+    max_breaks[user] = max_gap
+    
+max_user = None
+max_user_gap = 0
+
+for user, gap in max_breaks.items():
+    if gap > max_user_gap:
+        max_user_gap = gap
+        max_user = user
 
 
 
@@ -116,6 +141,8 @@ print(user_words)
 print(frq_words)
 print(most_frq)
 print(common_words)
+print(user_timestamps)
+print(max_breaks)
 
 
 
