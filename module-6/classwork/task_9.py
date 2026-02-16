@@ -110,12 +110,6 @@ if max_user_name != None:
 common_words = set.intersection(*user_words.values())
 
 
-for message in messages:
-    user = message["user"]
-    timestamp = message["timestamp"]
-    if user not in user_timestamps:
-        user_timestamps[user] = []
-    user_timestamps[user].append(timestamp)
     
 for user, timestamps in user_timestamps.items():
     timestamps.sort()
