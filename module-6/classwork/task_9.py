@@ -60,6 +60,7 @@ messages_count = {}
 user_words = {}
 frq_words = {}
 most_frq = {}
+max_breaks = {}
 
 
 
@@ -106,6 +107,8 @@ if max_user_name != None:
 
 
 common_words = set.intersection(*user_words.values())
+
+
 
     
 
