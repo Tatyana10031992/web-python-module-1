@@ -44,48 +44,78 @@
 7. Записать подробный отчёт в файл access_report.txt.
 """
 
-employees = [
-"2026-02-01,Иван,ENTER"
-"2026-02-01,Мария,ENTER"
-"2026-02-01,Иван,EXIT"
-"2026-02-01,Иван,EXIT"
-"2026-02-01,Олег,EXIT"
-"2026-02-02,Мария,EXIT"
-"2026-02-02,Олег,ENTER"
+f = [
+    "2026-02-01,Иван,ENTER",
+    "2026-02-01,Мария,ENTER",
+    "2026-02-01,Иван,EXIT",
+    "2026-02-01,Иван,EXIT",
+    "2026-02-01,Олег,EXIT",
+    "2026-02-02,Мария,EXIT",
+    "2026-02-02,Олег,ENTER",
 ]
 
-access_list = []
-
 with open("access.log", "w", encoding="utf-8") as file:
-   for employee in employees:
-      file.write(employee + "\n")
+    for line in f:
+        file.write(line + "\n")
+
+events = []
+
 with open("access.log", "r", encoding="utf-8") as file:
-   for line in file:
-      date, name,action = line.split(",")
-      access_list.append((date, name, action))
-print(access_list)
+    for line in file:
+        line = line.strip()
+        if line:
+            date, name, action = line.split(",")
+            events.append((date, name, action))
 
 stats = {}
 inside = {}
 errors = set()
 daily_enters = {}
 
+
 for date, name, action in events:
-   stats.setdefault(name, {"ENTER": 0, "EXIT": 0})
-   inside.setdefault(name, False)
-   daily_enters.setdefault(date, 0)
+    stats.setdefault(name, {"ENTER": 0, "EXIT": 0})
+    inside.setdefault(name, False)
+    daily_enters.setdefault(date, 0)
 
-   if action == "ENTER":
-      if inside[name]:
-         errors.add(name)
-      inside[name] = True
-      stats[name]["ENTER"] += 1
-      daily_enters[date] +=1
-   else:
-      if not inside[name]:
-         rrors.add(name)
-      inside[name] = False
-      stats[name]["EXIT"] += 1
+    if action == "ENTER":
+        if inside[name]:
+            errors.add(name) 
+        inside[name] = True
+        stats[name]["ENTER"] += 1
+        daily_enters[date] += 1
+    else:  
+        if not inside[name]:
+            errors.add(name) 
+        inside[name] = False
+        stats[name]["EXIT"] += 1
 
-   max_day = Nonemax
+max_day = None
+max_enters = 0
+for date, count in daily_enters.items():
+    if count > max_enters:
+        max_day = date
+        max_enters = count
 
+with open("access_report.txt", "w", encoding="utf-8") as report:
+    report.write("Отчёт по журналу доступа\n\n")
+
+    report.write("Статистика по сотрудникам:\n")
+    for name, data in stats.items():
+        status = "Внутри" if inside.get(name, False) else "Не внутри"
+        report.write(f"- {name}: ENTER={data['ENTER']}, EXIT={data['EXIT']}, Статус: {status}\n")
+
+    report.write("\nСотрудники с ошибками доступа:\n")
+    if errors:
+        for name in sorted(errors):
+            report.write(f"- {name}\n")
+    else:
+        report.write("Ошибок не выявлено\n")
+
+    report.write("\nКоличество входов по датам:\n")
+    for date in sorted(daily_enters.keys()):
+        report.write(f"- {date}: {daily_enters[date]}\n")
+
+    report.write(f"\nДата с максимальным количеством входов: {max_day} ({max_enters} входов)\n")
+
+print("Отчёт успешно создан в файле 'access_report.txt'")
